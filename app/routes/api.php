@@ -15,3 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/v1/front/posts', [\App\Http\Controllers\Api\v1\Front\Post\PostController::class, 'index']);
+Route::get('/v1/front/post/similar/{slug}', [\App\Http\Controllers\Api\v1\Front\Post\PostController::class, 'similar']);
+Route::get('/v1/front/post/show/{slug}', [\App\Http\Controllers\Api\v1\Front\Post\PostController::class, 'show']);
+Route::patch('/v1/front/post/favorite/{post}', [\App\Http\Controllers\Api\v1\Front\Post\PostController::class, 'favorite']);
+
+Route::get('/v1/front/cities', [\App\Http\Controllers\Api\v1\Front\City\CityController::class, 'index']);

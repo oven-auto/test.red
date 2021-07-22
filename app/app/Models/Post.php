@@ -30,4 +30,11 @@ class Post extends Model
     {
         return $query->where('favorite', 1);
     }
+
+    public function scopeByCity($query, $city_id )
+    {
+        $query ->where('city_id', $city_id)
+            ->orWhereNull('city_id');
+        return $query;
+    }
 }

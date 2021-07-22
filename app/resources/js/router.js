@@ -4,6 +4,7 @@ import Vue from 'vue';
 Vue.use(vueRouter);
 
 import postList from './views/post/PostListComponent';
+import postShow from './views/post/PostShowComponent';
 
 
 const routes = [
@@ -11,9 +12,14 @@ const routes = [
         path: '/',
         component: postList
     },
+    {
+        path: '/post/:slug',
+        component: postShow
+    },
 ];
 
 export default new vueRouter({
     mode: "history",
-    routes: routes
+    routes: routes,
+    props: true
 });

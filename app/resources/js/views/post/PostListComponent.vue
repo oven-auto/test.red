@@ -1,65 +1,88 @@
 <template>
     <div id="post-list">
-        <div class="row pb-3">
+        <div class="row pb-1">
             <div class="col h4">
                 {{page.title}}
             </div>
             <div class="col text-right">
-                <button :to="page.action.button.href" type="button" class="btn btn-success ">{{page.action.button.title}}</button>
+                <router-link
+                    :to="page.action.buttonFavorite.href"
+                    class="btn btn-success "
+                >
+                    {{page.action.buttonFavorite.title}}
+                </router-link>
+
+                <router-link
+                    :to="page.action.buttonAll.href"
+                    class="btn btn-success"
+                >
+                    {{page.action.buttonAll.title}}
+                </router-link>
+            </div>
+        </div>
+
+        <div class="row pb-3">
+            <div class="col">
+                <router-link v-for="itemCity in cities" class="btn btn-secondary mx-1" :to="'/?city_id=' + itemCity.id" >
+                    {{itemCity.name}}
+                </router-link>
             </div>
         </div>
 
 
         <div class="row row-cols-1 row-cols-md-3 g-4">
-            <div class="col" v-for="item in data">
-                <div class="card h-100">
-                    <img src="" class="card-img-top" alt="">
-                    <div class="card-body">
-                        <small class="text-muted">
-                            {{ (item.city.name) ? item.city.name : 'Общие' }}
-                        </small>
-                        <h5 class="card-title">
-                            {{item.title}}
-                        </h5>
-                        <p class="card-text">{{item.annotation}}</p>
-
-                        <a class="btn btn-warning btn-block">Открыть</a>
-                    </div>
-                    <div class="card-footer">
-                        <small class="text-muted">{{item.created_at ? item.created_at : 'Не знаю дату'}}</small>
-                    </div>
-                </div>
-            </div>
+            <postcell v-for="item in data" :post="item" ></postcell>
         </div>
     </div>
 </template>
 
 <script>
+import postcell from '../../components/PostCell';
+
 export default {
     name: 'post-list',
+    components: {
+        postcell
+    },
     data() {
         return {
             urlPath: '/api/v1/front/',
             page: {
-                title: 'Список новостей',
+                title: 'Новости',
                 action: {
-                    button: {
-                        title: 'Избранное',
-                        href: '/'
+                    buttonFavorite: {
+                        title: 'Избранные новости',
+                        href: '/',
+                    },
+                    buttonAll: {
+                        title: 'Все новости',
+                        href: '/?all=1',
                     }
                 }
 
             },
             data: [],
+            cities: []
         }
     },
     mounted()
     {
-        this.loadData();
+        this.loadCities();
+        this.loadData(this.setGetParam());
+
     },
     methods: {
-        loadData() {
-            axios.get(this.urlPath + 'posts')
+        loadCities() {
+            axios.get(this.urlPath + 'cities')
+            .then(res => {
+                this.cities = res.data;
+            })
+            .catch(errors => {
+
+            })
+        },
+        loadData(params = '') {
+            axios.get(this.urlPath + 'posts'+ params)
             .then(res => {
                 this.data = res.data;
             })
@@ -67,11 +90,35 @@ export default {
 
             })
         },
-        setParam(method = '') {
-            var formData = new FormData();
+        setGetParam() {
+            var query = this.$route.query;
+            var str = '';
 
-            return formData;
+            query = Object.entries(query);
+
+            query.forEach(([key, value], i) => {
+                if(i == 0)
+                    str+='/?';
+                else
+                    str+='&';
+                str+=key + '=' + value;
+            });
+
+            if(str.length == 0)
+                return '/?favorite=1'
+            return str;
         },
-    }
+
+    },
+    watch: {
+        '$route.query': {
+            immediate: true,
+            handler() {
+                this.loadData(this.setGetParam());
+            },
+        },
+    },
 }
 </script>
+
+
